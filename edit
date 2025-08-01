@@ -2192,44 +2192,54 @@ document.addEventListener('DOMContentLoaded', () => {
                 shuffle($recent_posts);
                 shuffle($old_posts);
                 
-                // Create mixed pattern: 4 most viewed + 4 recent + 4 old
+                // Create mixed pattern: 4 most popular + 4 recent + 4 old
                 $mixed_posts = [];
                 
-                // Add 4 most viewed posts (or all available if less than 4)
-                $mixed_posts = array_merge($mixed_posts, array_slice($most_viewed_posts, 0, 4));
+                // Ensure we have exactly 4 posts from each category
+                $popular_posts = array_slice($most_viewed_posts, 0, 4);
+                $recent_posts_slice = array_slice($recent_posts, 0, 4);
+                $old_posts_slice = array_slice($old_posts, 0, 4);
                 
-                // Add 4 recent posts (or all available if less than 4)
-                $mixed_posts = array_merge($mixed_posts, array_slice($recent_posts, 0, 4));
+                // If any category doesn't have enough posts, fill from other categories
+                $total_selected = count($popular_posts) + count($recent_posts_slice) + count($old_posts_slice);
                 
-                // Add 4 old posts (or all available if less than 4)
-                $mixed_posts = array_merge($mixed_posts, array_slice($old_posts, 0, 4));
-                
-                // If we don't have 12 posts yet, fill with additional posts from any category
-                if (count($mixed_posts) < 12) {
-                    $remaining_needed = 12 - count($mixed_posts);
+                if ($total_selected < 12) {
+                    $remaining_needed = 12 - $total_selected;
                     
-                    // Create a pool of all remaining posts (excluding already selected ones)
+                    // Create a pool of all remaining posts
                     $all_remaining_posts = array_merge($most_viewed_posts, $recent_posts, $old_posts);
-                    $selected_post_ids = array_map(function($post) { return $post->ID; }, $mixed_posts);
+                    $selected_post_ids = array_map(function($post) { return $post->ID; }, array_merge($popular_posts, $recent_posts_slice, $old_posts_slice));
                     $available_posts = array_filter($all_remaining_posts, function($post) use ($selected_post_ids) {
                         return !in_array($post->ID, $selected_post_ids);
                     });
                     
                     // If still not enough, add any remaining posts from all_posts
                     if (count($available_posts) < $remaining_needed) {
-                        $all_post_ids = array_map(function($post) { return $post->ID; }, $mixed_posts);
+                        $all_post_ids = array_map(function($post) { return $post->ID; }, array_merge($popular_posts, $recent_posts_slice, $old_posts_slice));
                         $additional_posts = array_filter($all_posts, function($post) use ($all_post_ids) {
                             return !in_array($post->ID, $all_post_ids);
                         });
                         $available_posts = array_merge($available_posts, $additional_posts);
                     }
                     
-                    // Shuffle and add remaining posts
+                    // Distribute remaining posts evenly across categories
                     shuffle($available_posts);
-                    $mixed_posts = array_merge($mixed_posts, array_slice($available_posts, 0, $remaining_needed));
+                    $additional_posts_slice = array_slice($available_posts, 0, $remaining_needed);
+                    
+                    // Add to categories that need more posts
+                    while (count($popular_posts) < 4 && !empty($additional_posts_slice)) {
+                        $popular_posts[] = array_shift($additional_posts_slice);
+                    }
+                    while (count($recent_posts_slice) < 4 && !empty($additional_posts_slice)) {
+                        $recent_posts_slice[] = array_shift($additional_posts_slice);
+                    }
+                    while (count($old_posts_slice) < 4 && !empty($additional_posts_slice)) {
+                        $old_posts_slice[] = array_shift($additional_posts_slice);
+                    }
                 }
                 
-                // Shuffle the final mixed array to randomize the order
+                // Combine all posts and shuffle for random order
+                $mixed_posts = array_merge($popular_posts, $recent_posts_slice, $old_posts_slice);
                 shuffle($mixed_posts);
                 
                 // Display the mixed posts
@@ -2243,23 +2253,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     $upload_date = extract_upload_date_from_excerpt(get_the_excerpt($post));
                     $post_date = strtotime($post->post_date);
                     
-                    // Determine post type for styling
+                    // Determine post type for styling based on which array the post came from
                     $post_type = '';
-                    if ($views > 1000) {
+                    if (in_array($post, $popular_posts)) {
                         $post_type = 'most-viewed';
-                    } elseif ($upload_date && $upload_date > strtotime('-30 days')) {
+                    } elseif (in_array($post, $recent_posts_slice)) {
                         $post_type = 'recent';
-                    } elseif ($post_date < strtotime('-6 months')) {
+                    } elseif (in_array($post, $old_posts_slice)) {
                         $post_type = 'old';
                     } else {
-                        $post_type = 'mixed'; // For posts that don't fit the main categories
+                        $post_type = 'mixed'; // Fallback
                     }
                 ?>
                 <div class="scroll-item random-item <?php echo esc_attr($post_type); ?>">
                     <a href="<?php echo esc_url($video_url); ?>" target="_blank" rel="noopener">
                         <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($title); ?>" loading="lazy">
                         <div class="item-title"><?php echo esc_html($title); ?></div>
-                        <div class="item-views"><?php echo number_format($views); ?> views</div>
                         <?php if ($post_type === 'recent'): ?>
                             <div class="item-badge recent-badge">New</div>
                         <?php elseif ($post_type === 'most-viewed'): ?>
