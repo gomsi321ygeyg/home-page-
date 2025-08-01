@@ -1002,6 +1002,38 @@ a { color:inherit; text-decoration:none; }
     padding-bottom: 8px; /* reduced from 15px */
 }
 
+/* Random section styling */
+.random-item {
+    position: relative;
+}
+
+.random-item .item-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    border-radius: 8px;
+    color: white;
+    z-index: 2;
+}
+
+.random-item .recent-badge {
+    background: linear-gradient(135deg, #00d4aa, #0099cc);
+    box-shadow: 0 2px 4px rgba(0, 212, 170, 0.3);
+}
+
+.random-item .popular-badge {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+    box-shadow: 0 2px 4px rgba(255, 107, 107, 0.3);
+}
+
+.random-item .classic-badge {
+    background: linear-gradient(135deg, #a55eea, #6c5ce7);
+    box-shadow: 0 2px 4px rgba(165, 94, 234, 0.3);
+}
+
 .category-item {
     position: relative;
 }
@@ -1072,6 +1104,13 @@ a { color:inherit; text-decoration:none; }
     .item-views, .item-count {
         font-size: 0.75rem;
         padding: 0 15px 12px;
+    }
+    
+    .random-item .item-badge {
+        top: 6px;
+        right: 6px;
+        padding: 1px 4px;
+        font-size: 0.6rem;
     }
 }
 
@@ -2115,25 +2154,87 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="horizontal-scroll">
             <div class="scroll-container">
                 <?php
-                // Get random posts
-                $random_posts = get_posts([
+                // Get all posts for mixing
+                $all_posts = get_posts([
                     'post_type' => 'post',
                     'post_status' => 'publish',
-                    'posts_per_page' => 12,
-                    'orderby' => 'rand'
+                    'posts_per_page' => -1
                 ]);
                 
-                foreach ($random_posts as $post):
+                // Separate posts into categories
+                $most_viewed_posts = [];
+                $recent_posts = [];
+                $old_posts = [];
+                
+                foreach ($all_posts as $post) {
+                    $content = $post->post_content;
+                    $views = extract_views_from_content($content);
+                    $upload_date = extract_upload_date_from_excerpt(get_the_excerpt($post));
+                    $post_date = strtotime($post->post_date);
+                    
+                    // Categorize posts
+                    if ($views > 1000) { // Most viewed (high view count)
+                        $most_viewed_posts[] = $post;
+                    } elseif ($upload_date && $upload_date > strtotime('-30 days')) { // Recent uploads (last 30 days)
+                        $recent_posts[] = $post;
+                    } elseif ($post_date < strtotime('-6 months')) { // Old posts (older than 6 months)
+                        $old_posts[] = $post;
+                    }
+                }
+                
+                // Shuffle each category
+                shuffle($most_viewed_posts);
+                shuffle($recent_posts);
+                shuffle($old_posts);
+                
+                // Create mixed pattern: 4 most viewed + 4 recent + 4 old
+                $mixed_posts = [];
+                
+                // Add 4 most viewed posts
+                $mixed_posts = array_merge($mixed_posts, array_slice($most_viewed_posts, 0, 4));
+                
+                // Add 4 recent posts
+                $mixed_posts = array_merge($mixed_posts, array_slice($recent_posts, 0, 4));
+                
+                // Add 4 old posts
+                $mixed_posts = array_merge($mixed_posts, array_slice($old_posts, 0, 4));
+                
+                // Shuffle the final mixed array to randomize the order
+                shuffle($mixed_posts);
+                
+                // Display the mixed posts
+                foreach ($mixed_posts as $post):
                     setup_postdata($post);
                     $content = $post->post_content;
                     $image_url = extract_image_url_from_content($content) ?: get_template_directory_uri().'/assets/default-thumb.jpg';
                     $video_url = extract_video_url_from_content($content) ?: '#';
                     $title = extract_title_from_content($content) ?: get_the_title($post);
+                    $views = extract_views_from_content($content);
+                    $upload_date = extract_upload_date_from_excerpt(get_the_excerpt($post));
+                    $post_date = strtotime($post->post_date);
+                    
+                    // Determine post type for styling
+                    $post_type = '';
+                    if ($views > 1000) {
+                        $post_type = 'most-viewed';
+                    } elseif ($upload_date && $upload_date > strtotime('-30 days')) {
+                        $post_type = 'recent';
+                    } elseif ($post_date < strtotime('-6 months')) {
+                        $post_type = 'old';
+                    }
                 ?>
-                <div class="scroll-item">
+                <div class="scroll-item random-item <?php echo esc_attr($post_type); ?>">
                     <a href="<?php echo esc_url($video_url); ?>" target="_blank" rel="noopener">
                         <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($title); ?>" loading="lazy">
                         <div class="item-title"><?php echo esc_html($title); ?></div>
+                        <div class="item-views"><?php echo number_format($views); ?> views</div>
+                        <?php if ($post_type === 'recent'): ?>
+                            <div class="item-badge recent-badge">New</div>
+                        <?php elseif ($post_type === 'most-viewed'): ?>
+                            <div class="item-badge popular-badge">Popular</div>
+                        <?php elseif ($post_type === 'old'): ?>
+                            <div class="item-badge classic-badge">Classic</div>
+                        <?php endif; ?>
                     </a>
                 </div>
                 <?php endforeach; wp_reset_postdata(); ?>
