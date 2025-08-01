@@ -1034,6 +1034,11 @@ a { color:inherit; text-decoration:none; }
     box-shadow: 0 2px 4px rgba(165, 94, 234, 0.3);
 }
 
+.random-item .mixed-badge {
+    background: linear-gradient(135deg, #fdcb6e, #e17055);
+    box-shadow: 0 2px 4px rgba(253, 203, 110, 0.3);
+}
+
 .category-item {
     position: relative;
 }
@@ -2190,14 +2195,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Create mixed pattern: 4 most viewed + 4 recent + 4 old
                 $mixed_posts = [];
                 
-                // Add 4 most viewed posts
+                // Add 4 most viewed posts (or all available if less than 4)
                 $mixed_posts = array_merge($mixed_posts, array_slice($most_viewed_posts, 0, 4));
                 
-                // Add 4 recent posts
+                // Add 4 recent posts (or all available if less than 4)
                 $mixed_posts = array_merge($mixed_posts, array_slice($recent_posts, 0, 4));
                 
-                // Add 4 old posts
+                // Add 4 old posts (or all available if less than 4)
                 $mixed_posts = array_merge($mixed_posts, array_slice($old_posts, 0, 4));
+                
+                // If we don't have 12 posts yet, fill with additional posts from any category
+                if (count($mixed_posts) < 12) {
+                    $remaining_needed = 12 - count($mixed_posts);
+                    
+                    // Create a pool of all remaining posts (excluding already selected ones)
+                    $all_remaining_posts = array_merge($most_viewed_posts, $recent_posts, $old_posts);
+                    $selected_post_ids = array_map(function($post) { return $post->ID; }, $mixed_posts);
+                    $available_posts = array_filter($all_remaining_posts, function($post) use ($selected_post_ids) {
+                        return !in_array($post->ID, $selected_post_ids);
+                    });
+                    
+                    // If still not enough, add any remaining posts from all_posts
+                    if (count($available_posts) < $remaining_needed) {
+                        $all_post_ids = array_map(function($post) { return $post->ID; }, $mixed_posts);
+                        $additional_posts = array_filter($all_posts, function($post) use ($all_post_ids) {
+                            return !in_array($post->ID, $all_post_ids);
+                        });
+                        $available_posts = array_merge($available_posts, $additional_posts);
+                    }
+                    
+                    // Shuffle and add remaining posts
+                    shuffle($available_posts);
+                    $mixed_posts = array_merge($mixed_posts, array_slice($available_posts, 0, $remaining_needed));
+                }
                 
                 // Shuffle the final mixed array to randomize the order
                 shuffle($mixed_posts);
@@ -2221,6 +2251,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         $post_type = 'recent';
                     } elseif ($post_date < strtotime('-6 months')) {
                         $post_type = 'old';
+                    } else {
+                        $post_type = 'mixed'; // For posts that don't fit the main categories
                     }
                 ?>
                 <div class="scroll-item random-item <?php echo esc_attr($post_type); ?>">
@@ -2234,6 +2266,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="item-badge popular-badge">Popular</div>
                         <?php elseif ($post_type === 'old'): ?>
                             <div class="item-badge classic-badge">Classic</div>
+                        <?php elseif ($post_type === 'mixed'): ?>
+                            <div class="item-badge mixed-badge">Mixed</div>
                         <?php endif; ?>
                     </a>
                 </div>
