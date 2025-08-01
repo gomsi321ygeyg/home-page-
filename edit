@@ -608,6 +608,31 @@ a { color:inherit; text-decoration:none; }
     user-select: none; /* Prevent text selection during drag */
 }
 
+/* Carousel Indicators */
+.carousel-indicators {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+}
+
+.carousel-indicators .dot {
+    width: 12px;
+    height: 12px;
+    background-color: rgba(255,255,255,0.6);
+    border-radius: 50%;
+    transition: background-color 0.3s, transform 0.3s;
+    cursor: pointer;
+}
+
+.carousel-indicators .dot.active {
+    background-color: #b2a4f8;
+    transform: scale(1.3);
+}
+
 .carousel-container:active {
     cursor: grabbing; /* Show grabbing cursor when dragging */
 }
@@ -740,6 +765,34 @@ a { color:inherit; text-decoration:none; }
   font-size: 1.3rem;
 }
 
+/* Category slide content styling */
+.slide:not(:first-child) .slide-content .slide-title {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #f7cfff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.slide:not(:first-child) .slide-content .view-category-btn {
+  padding: 4px 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #222045;
+  background-color: #b2a4f8;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.slide:not(:first-child) .slide-content .slide-count {
+  margin-top: 8px;
+  font-size: 1rem;
+  color: #b2a4f8;
+  font-weight: 500;
+}
+
 .slide-link {
   display: block;
   width: 100%;
@@ -766,6 +819,34 @@ a { color:inherit; text-decoration:none; }
   .slide:not(:first-child) .slide-desc { font-size: 0.9rem; }
   .slide:not(:first-child) .slide-content { padding: 12px; }
   .slide:not(:first-child) .slide-overlay { height: 120px; }
+  
+  /* Responsive carousel indicators */
+  .carousel-indicators {
+    bottom: 15px;
+    gap: 8px;
+  }
+  
+  .carousel-indicators .dot {
+    width: 10px;
+    height: 10px;
+  }
+  
+  /* Responsive category slide content */
+  .slide:not(:first-child) .slide-content .slide-title {
+    font-size: 1.8rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .slide:not(:first-child) .slide-content .view-category-btn {
+    font-size: 0.8rem;
+    padding: 3px 8px;
+  }
+  
+  .slide:not(:first-child) .slide-content .slide-count {
+    font-size: 0.9rem;
+  }
 }
 
 
@@ -905,6 +986,10 @@ a { color:inherit; text-decoration:none; }
     font-weight: 500;
 }
 
+.category-item .item-count {
+    padding-bottom: 8px; /* reduced from 15px */
+}
+
 .category-item {
     position: relative;
 }
@@ -912,11 +997,14 @@ a { color:inherit; text-decoration:none; }
 .category-item img {
     display: block;
     width: 100%;
-    height: auto;
-    object-fit: contain;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
     background: #141227;
     border-top-left-radius: 16px;
     border-top-right-radius: 16px;
+    /* Fade effect on image */
+    -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
 }
 
 .category-item::after {
@@ -1531,12 +1619,24 @@ a { color:inherit; text-decoration:none; }
                     <img class="slide-image" src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($cat->name); ?>">
                     <div class="slide-overlay"></div>
                     <div class="slide-content">
-                        <div class="slide-title"><?php echo esc_html($cat->name); ?></div>
+                        <div class="slide-title">
+                            <?php echo esc_html($cat->name); ?>
+                            <span class="view-category-btn">View Category</span>
+                        </div>
                         <div class="slide-desc"><?php echo esc_html($cat->description); ?></div>
+                        <div class="slide-count"><?php echo $cat->count; ?> posts</div>
                     </div>
                 </a>
             </div>
         <?php endforeach; ?>
+    </div>
+    
+    <!-- Carousel Indicators -->
+    <div class="carousel-indicators">
+        <?php $totalSlides = 1 + count($categories); ?>
+        <?php for ($i = 0; $i < $totalSlides; $i++): ?>
+            <span class="dot<?php if ($i === 0) echo ' active'; ?>"></span>
+        <?php endfor; ?>
     </div>
 
 </div>
@@ -1580,6 +1680,13 @@ function getSlideWidth() {
     return window.innerWidth;
 }
 
+// Update carousel indicators
+function updateIndicators(idx) {
+    document.querySelectorAll('.carousel-indicators .dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i === idx);
+    });
+}
+
 // Go to specific slide by index (0-4) using scrollLeft
 function goToSlide(index, useTransition = true) {
     // Enforce boundaries
@@ -1597,6 +1704,9 @@ function goToSlide(index, useTransition = true) {
     } else {
         carouselContainer.scrollLeft = scrollPosition;
     }
+    
+    // Update indicators
+    updateIndicators(index);
 }
 
 // Auto-scroll function - goes through all 5 slides once using scrollBy
@@ -1672,6 +1782,10 @@ carouselContainer.addEventListener('scroll', () => {
             updateCurrentIndex();
             goToSlide(currentIndex, true);
         }, 300);
+        
+        // Update indicators based on current scroll position
+        updateCurrentIndex();
+        updateIndicators(currentIndex);
     }
 });
 
@@ -1803,6 +1917,14 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Set focus so arrow keys work
     carouselContainer.setAttribute('tabindex', '0');
+    
+    // Add click functionality to carousel indicators
+    document.querySelectorAll('.carousel-indicators .dot').forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+            stopAutoScroll();
+            goToSlide(index, true);
+        });
+    });
     
     // Start auto-scroll after a brief delay
     setTimeout(() => {
