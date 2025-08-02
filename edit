@@ -815,7 +815,7 @@ a { color:inherit; text-decoration:none; }
 .slide-title {
   font-size: 3rem;
   font-weight: 800;
-  color: #f7cfff;
+  color: #b2a4f8 !important;
   text-shadow: 0 2px 8px #18162a;
   margin-bottom: 16px;
 }
@@ -838,7 +838,7 @@ a { color:inherit; text-decoration:none; }
 .slide:not(:first-child) .slide-content .slide-title {
   font-size: 2.8rem;
   font-weight: 700;
-  color: #f7cfff;
+  color: #b2a4f8 !important;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -1048,7 +1048,7 @@ a { color:inherit; text-decoration:none; }
     box-shadow: 0 2px 12px 0 rgba(30,27,54,0.1); /* Lighter shadow */
   }
   
-  /* Color consistency */
+  /* Color consistency - All screen types */
   .section-title, .slide-title {
     color: #b2a4f8 !important;
   }
@@ -1059,11 +1059,10 @@ a { color:inherit; text-decoration:none; }
     font-size: 0.8rem;
     color: #b2a4f8;
     font-weight: 600;
-    margin-top: 4px;
     padding: 2px 8px;
-    background: rgba(178, 164, 248, 0.1);
-    border-radius: 12px;
-    display: inline-block;
+    display: block;
+    margin: 0 auto;
+    width: fit-content;
   }
   
   /* Optimize post titles for mobile */
@@ -1119,9 +1118,21 @@ a { color:inherit; text-decoration:none; }
 .section-title {
     font-size: 2rem;
     font-weight: 800;
-    color: #f7cfff;
+    color: #b2a4f8 !important;
     margin: 0;
     text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* Series Day item styling - All screen types */
+.series-day-item .day-number {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #b2a4f8;
+    font-weight: 600;
+    padding: 2px 8px;
+    display: block;
+    margin: 0 auto;
+    width: fit-content;
 }
 
 .view-more-btn {
@@ -1231,6 +1242,7 @@ a { color:inherit; text-decoration:none; }
     font-size: 0.85rem;
     color: #b2a4f8;
     font-weight: 500;
+    text-align: center;
 }
 
 .category-item .item-count {
@@ -1344,6 +1356,7 @@ a { color:inherit; text-decoration:none; }
     .item-views, .item-count {
         font-size: 0.75rem;
         padding: 0 15px 12px;
+        text-align: center;
     }
     
     .random-item .item-badge {
@@ -2307,10 +2320,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <a href="<?php echo esc_url($video_url); ?>" target="_blank" rel="noopener">
                         <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($title); ?>" loading="lazy">
                         <div class="item-title"><?php echo esc_html($title); ?></div>
-                        <?php if ($dayText): ?>
-                            <div class="day-number"><?php echo esc_html($dayText); ?></div>
-                        <?php endif; ?>
                     </a>
+                    <?php if ($dayText): ?>
+                        <div class="day-number"><?php echo esc_html($dayText); ?></div>
+                    <?php endif; ?>
                 </div>
                 <?php endforeach; wp_reset_postdata(); ?>
             </div>
