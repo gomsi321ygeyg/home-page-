@@ -933,8 +933,8 @@ a { color:inherit; text-decoration:none; }
     display: flex;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
-    gap: 12px;
-    padding: 10px 0;
+    gap: 8px; /* Reduced gap between posts */
+    padding: 8px 0; /* Reduced padding */
     /* Enhanced touch scrolling */
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
@@ -950,11 +950,11 @@ a { color:inherit; text-decoration:none; }
   }
 
   .scroll-container .scroll-item {
-    min-width: 200px;
+    min-width: calc(50% - 4px); /* Half screen width minus half gap */
     scroll-snap-align: start;
     flex-shrink: 0;
-    width: 200px;
-    max-width: 200px;
+    width: calc(50% - 4px);
+    max-width: calc(50% - 4px);
     /* Better touch interaction */
     touch-action: manipulation;
     user-select: none;
@@ -968,6 +968,8 @@ a { color:inherit; text-decoration:none; }
     touch-action: pan-x;
     /* Better touch responsiveness */
     -webkit-overflow-scrolling: touch;
+    /* Optimize for mobile */
+    padding: 0 4px; /* Reduced padding */
   }
   
   /* Additional touch improvements for scroll containers */
@@ -998,9 +1000,40 @@ a { color:inherit; text-decoration:none; }
     transform: scale(0.98);
   }
   
+  /* Mobile post card optimizations */
+  .scroll-item {
+    /* Optimize for mobile display */
+    border-radius: 12px; /* Slightly smaller radius for mobile */
+    box-shadow: 0 2px 12px 0 rgba(30,27,54,0.1); /* Lighter shadow */
+  }
+  
+  /* Optimize post titles for mobile */
+  .item-title {
+    font-size: 0.9rem; /* Slightly smaller font for mobile */
+    padding: 12px 8px; /* Reduced padding */
+    line-height: 1.2; /* Tighter line height */
+  }
+  
+  /* Optimize post images for mobile */
+  .scroll-item img {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+  
   /* Ensure all sections show at least 15 posts */
   .content-section {
-    margin-bottom: 40px;
+    margin-bottom: 30px; /* Reduced margin for mobile */
+  }
+  
+  /* Optimize content sections for mobile */
+  .content-sections {
+    padding: 20px 12px; /* Reduced padding for mobile */
+  }
+  
+  /* Adjust section headers for mobile */
+  .section-header {
+    padding: 0 4px; /* Reduced padding */
+    margin-bottom: 15px; /* Reduced margin */
   }
 }
 
