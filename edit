@@ -587,6 +587,53 @@ a { color:inherit; text-decoration:none; }
     }
 }
 
+/* Mobile Header Fixes */
+@media screen and (max-width: 767px) {
+    .header-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 16px;
+    }
+
+    .header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 0;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .header-logo {
+        margin-left: 6px; /* Reduce spacing from menu */
+    }
+
+    .search-container {
+        flex: 1;
+        margin: 0 12px;
+    }
+
+    .header-right {
+        margin-left: auto;
+    }
+
+    #hamburger, .header-logo, .search-bar-wrap, #login-signup-btn {
+        height: 36px; /* Consistent height */
+        display: flex;
+        align-items: center;
+    }
+
+    #login-signup-btn {
+        margin-left: auto;
+    }
+}
+
 .carousel-container { 
     margin-top: 60px; 
     padding: 0; 
@@ -858,6 +905,39 @@ a { color:inherit; text-decoration:none; }
   
   .slide:not(:first-child) .slide-content .slide-count {
     font-size: 0.9rem;
+  }
+}
+
+/* Mobile Carousel Slide Size - Reduce by 40% */
+@media screen and (max-width: 767px) {
+  .slide {
+    height: 60vh !important; /* 100% - 40% */
+  }
+  
+  .carousel-container {
+    height: 60vh !important;
+  }
+  
+  /* Mobile Horizontal Scrolling for All Sections */
+  .scroll-container {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 12px;
+    padding: 10px 0;
+  }
+
+  .scroll-container .scroll-item {
+    min-width: 200px;
+    scroll-snap-align: start;
+    flex-shrink: 0;
+    width: 200px;
+    max-width: 200px;
+  }
+  
+  /* Ensure all sections show at least 15 posts */
+  .content-section {
+    margin-bottom: 40px;
   }
 }
 
@@ -1233,6 +1313,33 @@ a { color:inherit; text-decoration:none; }
     
     .footer-section a::before {
         display: none;
+    }
+}
+
+/* Mobile Footer Layout - 2 Column */
+@media screen and (max-width: 767px) {
+    .footer-content {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 20px;
+        grid-template-columns: unset;
+    }
+
+    .footer-section {
+        width: 48%; /* Two columns */
+        text-align: left;
+    }
+    
+    .footer-section h3 {
+        font-size: 1rem;
+        margin-bottom: 12px;
+    }
+    
+    .footer-section a {
+        font-size: 0.85rem;
+        padding: 6px 0;
+        justify-content: flex-start;
     }
 }
 
@@ -1997,7 +2104,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     $series_posts = get_posts([
                         'post_type' => 'post',
                         'post_status' => 'publish',
-                        'posts_per_page' => 12,
+                        'posts_per_page' => 15,
                         'orderby' => 'date',
                         'order' => 'DESC',
                         'cat' => $series_category->term_id
@@ -2050,7 +2157,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     return strtotime($b->post_date) - strtotime($a->post_date);
                 });
                 
-                $recent_posts = array_slice($all_posts, 0, 12);
+                $recent_posts = array_slice($all_posts, 0, 15);
                 
                 foreach ($recent_posts as $post):
                     setup_postdata($post);
@@ -2093,7 +2200,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     return $views_b - $views_a;
                 });
                 
-                $popular_posts = array_slice($all_posts, 0, 12);
+                $popular_posts = array_slice($all_posts, 0, 15);
                 
                 foreach ($popular_posts as $post):
                     setup_postdata($post);
@@ -2192,19 +2299,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 shuffle($recent_posts);
                 shuffle($old_posts);
                 
-                // Create mixed pattern: 4 most popular + 4 recent + 4 old
+                // Create mixed pattern: 5 most popular + 5 recent + 5 old (15 total)
                 $mixed_posts = [];
                 
-                // Ensure we have exactly 4 posts from each category
-                $popular_posts = array_slice($most_viewed_posts, 0, 4);
-                $recent_posts_slice = array_slice($recent_posts, 0, 4);
-                $old_posts_slice = array_slice($old_posts, 0, 4);
+                // Ensure we have exactly 5 posts from each category
+                $popular_posts = array_slice($most_viewed_posts, 0, 5);
+                $recent_posts_slice = array_slice($recent_posts, 0, 5);
+                $old_posts_slice = array_slice($old_posts, 0, 5);
                 
                 // If any category doesn't have enough posts, fill from other categories
                 $total_selected = count($popular_posts) + count($recent_posts_slice) + count($old_posts_slice);
                 
-                if ($total_selected < 12) {
-                    $remaining_needed = 12 - $total_selected;
+                if ($total_selected < 15) {
+                    $remaining_needed = 15 - $total_selected;
                     
                     // Create a pool of all remaining posts
                     $all_remaining_posts = array_merge($most_viewed_posts, $recent_posts, $old_posts);
@@ -2227,13 +2334,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     $additional_posts_slice = array_slice($available_posts, 0, $remaining_needed);
                     
                     // Add to categories that need more posts
-                    while (count($popular_posts) < 4 && !empty($additional_posts_slice)) {
+                    while (count($popular_posts) < 5 && !empty($additional_posts_slice)) {
                         $popular_posts[] = array_shift($additional_posts_slice);
                     }
-                    while (count($recent_posts_slice) < 4 && !empty($additional_posts_slice)) {
+                    while (count($recent_posts_slice) < 5 && !empty($additional_posts_slice)) {
                         $recent_posts_slice[] = array_shift($additional_posts_slice);
                     }
-                    while (count($old_posts_slice) < 4 && !empty($additional_posts_slice)) {
+                    while (count($old_posts_slice) < 5 && !empty($additional_posts_slice)) {
                         $old_posts_slice[] = array_shift($additional_posts_slice);
                     }
                 }
