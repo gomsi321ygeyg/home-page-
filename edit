@@ -539,6 +539,20 @@ a { color:inherit; text-decoration:none; }
     .header-content {
         padding: 10px 15px;
         height: 50px;
+        justify-content: center;
+        position: relative;
+    }
+    
+    /* Hamburger on left */
+    #hamburger {
+        position: absolute;
+        left: 16px;
+    }
+    
+    /* Login button on right */
+    #login-signup-btn {
+        position: absolute;
+        right: 16px;
     }
     
     .header-home {
@@ -643,34 +657,40 @@ a { color:inherit; text-decoration:none; }
 
 /* Carousel Indicators */
 .carousel-indicators {
-    position: fixed;
-    bottom: 20px;
+    position: absolute;
+    bottom: 16px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 12px;
-    z-index: 1000;
+    justify-content: space-between;
+    width: 200px;
 }
 
-.indicator {
+.carousel-indicators .dot {
+    display: block;
     width: 12px;
     height: 12px;
+    background: #ccc;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.4);
     cursor: pointer;
     transition: all 0.3s ease;
-    border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
-.indicator:hover {
-    background: rgba(255, 255, 255, 0.7);
+.carousel-indicators .glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 12px;
+    height: 12px;
+    background: #b2a4f8;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #b2a4f8;
+    transition: left 0.4s ease;
+}
+
+.carousel-indicators .dot:hover {
+    background: #b2a4f8;
     transform: scale(1.1);
-}
-
-.indicator.active {
-    background: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
-    transform: scale(1.2);
 }
 
 /* Slide image: different for first slide and others */
@@ -754,7 +774,7 @@ a { color:inherit; text-decoration:none; }
 .slide-title {
   font-size: 3rem;
   font-weight: 800;
-  color: #f7cfff;
+  color: #b2a4f8 !important;
   text-shadow: 0 2px 8px #18162a;
   margin-bottom: 16px;
 }
@@ -824,7 +844,7 @@ a { color:inherit; text-decoration:none; }
 .section-title {
     font-size: 2rem;
     font-weight: 800;
-    color: #f7cfff;
+    color: #b2a4f8 !important;
     margin: 0;
     text-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
@@ -849,6 +869,24 @@ a { color:inherit; text-decoration:none; }
     color: #fff;
 }
 
+.view-category-btn {
+    background: linear-gradient(135deg, #3a2d70, #2a2754);
+    color: #fff;
+    border-radius: 25px;
+    padding: 10px 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: 2px solid #4a3d80;
+    box-shadow: 0 4px 15px rgba(80,60,180,0.2);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.view-category-btn:hover {
+    background: linear-gradient(135deg, #4a3d80, #3a2d70);
+    box-shadow: 0 6px 20px rgba(80,60,180,0.3);
+}
+
 .horizontal-scroll {
     overflow: hidden;
     position: relative;
@@ -856,16 +894,16 @@ a { color:inherit; text-decoration:none; }
 
 .scroll-container {
     display: flex;
-    gap: 20px;
     overflow-x: auto;
+    scroll-snap-type: x mandatory;  /* enable snapping on X-axis */
+    -webkit-overflow-scrolling: touch; /* momentum scroll on iOS */
     scroll-behavior: smooth;
+    gap: 10px; /* 50% reduced spacing (was 20px) */
     padding: 10px 0;
     cursor: grab;
     scrollbar-width: none;
     -ms-overflow-style: none;
     user-select: none;
-    -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x mandatory;
     width: 100%;
     touch-action: pan-x pan-y; /* Allow both horizontal and vertical touch actions */
     overscroll-behavior: auto; /* Allow scroll chaining to parent for vertical scroll */
@@ -891,6 +929,7 @@ a { color:inherit; text-decoration:none; }
     transition: transform .13s, border-color .13s;
     flex-shrink: 0;
     pointer-events: auto; /* Ensure child elements can be interacted with */
+    scroll-snap-align: center;  /* snap each item to center */
 }
 
 .scroll-item:hover {
@@ -966,10 +1005,20 @@ a { color:inherit; text-decoration:none; }
     z-index: 1;
 }
 
+/* Series Day Item Styling */
+.series-day-item .day-number {
+    text-align: center;
+    color: #b2a4f8;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0 18px 15px;
+    margin-top: -5px;
+}
+
 /* Responsive Design */
 @media (max-width: 1400px) {
     .scroll-item {
-        width: calc(20% - 16px);
+        width: calc(20% - 8px);
         min-width: 220px;
         max-width: 260px;
     }
@@ -977,7 +1026,7 @@ a { color:inherit; text-decoration:none; }
 
 @media (max-width: 1200px) {
     .scroll-item {
-        width: calc(25% - 15px);
+        width: calc(25% - 7.5px);
         min-width: 200px;
         max-width: 240px;
     }
@@ -985,7 +1034,7 @@ a { color:inherit; text-decoration:none; }
 
 @media (max-width: 900px) {
     .scroll-item {
-        width: calc(33.333% - 13px);
+        width: calc(33.333% - 6.67px);
         min-width: 180px;
         max-width: 220px;
     }
@@ -1006,7 +1055,7 @@ a { color:inherit; text-decoration:none; }
     }
     
     .scroll-item {
-        width: calc(50% - 10px);
+        width: calc(50% - 5px);
         min-width: 160px;
         max-width: 200px;
     }
@@ -1121,9 +1170,12 @@ a { color:inherit; text-decoration:none; }
 /* Responsive Footer */
 @media (max-width: 768px) {
     .footer-content {
-        grid-template-columns: 1fr;
-        gap: 30px;
-        text-align: center;
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+    .footer-section {
+        width: 50%;  /* two per row */
     }
     
     .footer-section a {
@@ -1573,11 +1625,12 @@ a { color:inherit; text-decoration:none; }
     </div>
     <!-- Slide Indicators -->
     <div class="carousel-indicators">
-        <div class="indicator active" data-slide="0"></div>
-        <div class="indicator" data-slide="1"></div>
-        <div class="indicator" data-slide="2"></div>
-        <div class="indicator" data-slide="3"></div>
-        <div class="indicator" data-slide="4"></div>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="glow"></span>
     </div>
 </div>
 <script>
@@ -1609,7 +1662,7 @@ document.body.addEventListener('mousedown',function(e){
 const carousel = document.getElementById('carousel');
 const carouselContainer = document.querySelector('.carousel-container');
 const slides = carousel.children;
-const indicators = document.querySelectorAll('.indicator');
+const indicators = document.querySelectorAll('.carousel-indicators .dot');
 let currentIndex = 0;
 const slideCount = 5; // Exactly 5 slides
 let autoScrollInterval;
@@ -1680,9 +1733,15 @@ function stopAutoScroll() {
 
 // Update indicators
 function updateIndicators() {
-    indicators.forEach((indicator, index) => {
-        indicator.classList.toggle('active', index === currentIndex);
-    });
+    const dots = document.querySelectorAll('.carousel-indicators .dot');
+    const glow = document.querySelector('.carousel-indicators .glow');
+    if (!glow || dots.length === 0) return;
+    const targetDot = dots[currentIndex];
+    if (targetDot) {
+        // Center the glow on the target dot
+        const offset = targetDot.offsetLeft + targetDot.offsetWidth/2 - glow.offsetWidth/2;
+        glow.style.left = `${offset}px`;
+    }
 }
 
 // Update current index based on scroll position
@@ -1882,36 +1941,48 @@ document.addEventListener('DOMContentLoaded', () => {
     <section class="content-section">
         <div class="section-header">
             <h2 class="section-title">Series Day</h2>
-            <a href="series-day-x.php" class="view-more-btn">View More</a>
+            <a href="https://anifinder.in/series-day-x/" class="view-more-btn">View More</a>
         </div>
         <div class="horizontal-scroll">
             <div class="scroll-container">
                 <?php
-                // Get series day posts from series-day-x category
-                $series_category = get_category_by_slug('series-day-x');
+                $series_cat = get_category_by_slug('series-day-x');
                 $series_posts = [];
-                if ($series_category) {
+                if ($series_cat) {
+                    // Get all posts in category
                     $series_posts = get_posts([
                         'post_type' => 'post',
                         'post_status' => 'publish',
-                        'posts_per_page' => 12,
-                        'orderby' => 'date',
-                        'order' => 'DESC',
-                        'cat' => $series_category->term_id
+                        'posts_per_page' => -1,
+                        'cat' => $series_cat->term_id
                     ]);
+                    // Extract day number and sort descending
+                    usort($series_posts, function($a, $b) {
+                        preg_match('/Day\s+(\d+)/i', $a->post_excerpt, $m1);
+                        preg_match('/Day\s+(\d+)/i', $b->post_excerpt, $m2);
+                        $dayA = isset($m1[1]) ? intval($m1[1]) : 0;
+                        $dayB = isset($m2[1]) ? intval($m2[1]) : 0;
+                        return $dayB - $dayA;
+                    });
+                    // Limit to top 15
+                    $series_posts = array_slice($series_posts, 0, 15);
                 }
                 
-                foreach ($series_posts as $post):
-                    setup_postdata($post);
+                foreach ($series_posts as $post): setup_postdata($post);
+                    preg_match('/Day\s+(\d+)/i', $post->post_excerpt, $matches);
+                    $dayText = !empty($matches[0]) ? $matches[0] : '';
                     $content = $post->post_content;
                     $image_url = extract_image_url_from_content($content) ?: get_template_directory_uri().'/assets/default-thumb.jpg';
                     $video_url = extract_video_url_from_content($content) ?: '#';
                     $title = extract_title_from_content($content) ?: get_the_title($post);
                 ?>
-                <div class="scroll-item">
+                <div class="scroll-item series-day-item">
                     <a href="<?php echo esc_url($video_url); ?>" target="_blank" rel="noopener">
                         <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($title); ?>" loading="lazy">
                         <div class="item-title"><?php echo esc_html($title); ?></div>
+                        <?php if ($dayText): ?>
+                            <div class="day-number"><?php echo esc_html($dayText); ?></div>
+                        <?php endif; ?>
                     </a>
                 </div>
                 <?php endforeach; wp_reset_postdata(); ?>
@@ -1923,7 +1994,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <section class="content-section">
         <div class="section-header">
             <h2 class="section-title">Recent Upload</h2>
-            <a href="recent upload.php" class="view-more-btn">View More</a>
+            <a href="https://anifinder.in/recent-uploads/" class="view-more-btn">View More</a>
         </div>
         <div class="horizontal-scroll">
             <div class="scroll-container">
@@ -1971,7 +2042,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <section class="content-section">
         <div class="section-header">
             <h2 class="section-title">Most Viewed</h2>
-            <a href="most-popular.php" class="view-more-btn">View More</a>
+            <a href="https://anifinder.in/most-popular/" class="view-more-btn">View More</a>
         </div>
         <div class="horizontal-scroll">
             <div class="scroll-container">
@@ -2016,7 +2087,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <section class="content-section">
         <div class="section-header">
             <h2 class="section-title">Categories</h2>
-            <a href="category.php" class="view-more-btn">View All</a>
+            <a href="https://anifinder.in/categories/" class="view-more-btn">View All</a>
         </div>
         <div class="horizontal-scroll">
             <div class="scroll-container">
@@ -2051,7 +2122,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <section class="content-section">
         <div class="section-header">
             <h2 class="section-title">Random</h2>
-            <a href="random.php" class="view-more-btn">View More</a>
+            <a href="https://anifinder.in/random/" class="view-more-btn">View More</a>
         </div>
         <div class="horizontal-scroll">
             <div class="scroll-container">
