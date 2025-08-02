@@ -607,20 +607,23 @@ a { color:inherit; text-decoration:none; }
     .header-left {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 4px; /* Reduced gap between hamburger and logo */
     }
 
     .header-logo {
-        margin-left: 6px; /* Reduce spacing from menu */
+        margin-left: 4px; /* Further reduced spacing from menu */
     }
 
     .search-container {
         flex: 1;
         margin: 0 12px;
+        max-width: 180px; /* Limit search width on mobile */
     }
 
     .header-right {
         margin-left: auto;
+        display: flex;
+        align-items: center;
     }
 
     #hamburger, .header-logo, .search-bar-wrap, #login-signup-btn {
@@ -631,6 +634,13 @@ a { color:inherit; text-decoration:none; }
 
     #login-signup-btn {
         margin-left: auto;
+        margin-right: 0; /* Ensure it's at the far right */
+        padding: 8px 16px; /* Slightly larger touch target */
+    }
+    
+    /* Ensure proper spacing */
+    .header-left, .search-container, .header-right {
+        flex-shrink: 0;
     }
 }
 
@@ -925,6 +935,18 @@ a { color:inherit; text-decoration:none; }
     scroll-snap-type: x mandatory;
     gap: 12px;
     padding: 10px 0;
+    /* Enhanced touch scrolling */
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    touch-action: pan-x;
+    overscroll-behavior-x: contain;
+    /* Improved momentum scrolling */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .scroll-container::-webkit-scrollbar {
+    display: none;
   }
 
   .scroll-container .scroll-item {
@@ -933,6 +955,47 @@ a { color:inherit; text-decoration:none; }
     flex-shrink: 0;
     width: 200px;
     max-width: 200px;
+    /* Better touch interaction */
+    touch-action: manipulation;
+    user-select: none;
+  }
+  
+  /* Enhanced touch scrolling for mobile */
+  .horizontal-scroll {
+    overflow: hidden;
+    position: relative;
+    /* Prevent vertical scroll interference */
+    touch-action: pan-x;
+    /* Better touch responsiveness */
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Additional touch improvements for scroll containers */
+  .scroll-container {
+    /* Enhanced momentum scrolling */
+    -webkit-overflow-scrolling: touch;
+    /* Prevent scroll chaining */
+    overscroll-behavior-x: contain;
+    overscroll-behavior-y: none;
+    /* Smooth scrolling */
+    scroll-behavior: smooth;
+    /* Better touch handling */
+    touch-action: pan-x;
+  }
+  
+  /* Improve touch targets for scroll items */
+  .scroll-item {
+    /* Better touch interaction */
+    touch-action: manipulation;
+    /* Prevent text selection during scroll */
+    user-select: none;
+    /* Smooth transitions */
+    transition: transform 0.2s ease;
+  }
+  
+  /* Active state for better touch feedback */
+  .scroll-item:active {
+    transform: scale(0.98);
   }
   
   /* Ensure all sections show at least 15 posts */
