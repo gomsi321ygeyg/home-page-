@@ -608,6 +608,7 @@ a { color:inherit; text-decoration:none; }
         display: flex;
         align-items: center;
         gap: 4px; /* Reduced gap between hamburger and logo */
+        margin-left: 0; /* Ensure no extra margin */
     }
 
     .header-logo {
@@ -622,6 +623,7 @@ a { color:inherit; text-decoration:none; }
 
     .header-right {
         margin-left: auto;
+        margin-right: 0; /* Ensure no extra margin */
         display: flex;
         align-items: center;
     }
@@ -641,6 +643,15 @@ a { color:inherit; text-decoration:none; }
     /* Ensure proper spacing */
     .header-left, .search-container, .header-right {
         flex-shrink: 0;
+    }
+    
+    /* Symmetrical spacing */
+    .header-left {
+        padding-left: 0;
+    }
+    
+    .header-right {
+        padding-right: 0;
     }
 }
 
@@ -932,9 +943,9 @@ a { color:inherit; text-decoration:none; }
   .scroll-container {
     display: flex;
     overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    gap: 8px; /* Reduced gap between posts */
-    padding: 8px 0; /* Reduced padding */
+    scroll-snap-type: x proximity; /* Changed to proximity for smoother scrolling */
+    gap: 4px; /* Further reduced gap between posts */
+    padding: 6px 0; /* Reduced padding */
     /* Enhanced touch scrolling */
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
@@ -943,6 +954,8 @@ a { color:inherit; text-decoration:none; }
     /* Improved momentum scrolling */
     scrollbar-width: none;
     -ms-overflow-style: none;
+    /* Smoother scrolling */
+    scroll-snap-stop: normal;
   }
 
   .scroll-container::-webkit-scrollbar {
@@ -950,11 +963,11 @@ a { color:inherit; text-decoration:none; }
   }
 
   .scroll-container .scroll-item {
-    min-width: calc(50% - 4px); /* Half screen width minus half gap */
-    scroll-snap-align: start;
+    min-width: calc(50% - 2px); /* Half screen width minus half gap */
+    scroll-snap-align: center; /* Changed to center for smoother scrolling */
     flex-shrink: 0;
-    width: calc(50% - 4px);
-    max-width: calc(50% - 4px);
+    width: calc(50% - 2px);
+    max-width: calc(50% - 2px);
     /* Better touch interaction */
     touch-action: manipulation;
     user-select: none;
@@ -983,6 +996,11 @@ a { color:inherit; text-decoration:none; }
     scroll-behavior: smooth;
     /* Better touch handling */
     touch-action: pan-x;
+    /* Smoother scrolling */
+    scroll-snap-type: x proximity;
+    scroll-snap-stop: normal;
+    /* Optimize for mobile */
+    will-change: scroll-position;
   }
   
   /* Improve touch targets for scroll items */
@@ -2574,10 +2592,10 @@ document.querySelectorAll('.scroll-container').forEach(container => {
         const timeDiff = currentTime - lastTouchTime;
         
         // Determine scroll direction only on first significant movement
-        if (scrollDirection === null && (diffX > 10 || diffY > 10)) {
-            if (diffX > diffY * 1.5) {
+        if (scrollDirection === null && (diffX > 8 || diffY > 8)) { // Reduced threshold for faster response
+            if (diffX > diffY * 1.2) { // Reduced ratio for easier horizontal detection
                 scrollDirection = 'horizontal';
-            } else if (diffY > diffX * 1.5) {
+            } else if (diffY > diffX * 1.2) {
                 scrollDirection = 'vertical';
             }
         }
@@ -2588,10 +2606,10 @@ document.querySelectorAll('.scroll-container').forEach(container => {
             hasMovedHorizontally = true;
             
             if (timeDiff > 0) {
-                touchVelocity = diff / timeDiff * 20; // Calculate velocity with higher sensitivity
+                touchVelocity = diff / timeDiff * 25; // Increased sensitivity for smoother scrolling
             }
             
-            container.scrollLeft += diff * 2.5; // More responsive touch scrolling
+            container.scrollLeft += diff * 3.0; // Increased multiplier for more responsive scrolling
         }
         // For vertical scrolling or undetermined direction, let the browser handle it naturally
         
@@ -2604,11 +2622,11 @@ document.querySelectorAll('.scroll-container').forEach(container => {
         isScrolling = false;
         
         // Only apply momentum scrolling if we were doing horizontal scrolling
-        if (hasMovedHorizontally && Math.abs(touchVelocity) > 0.5) {
+        if (hasMovedHorizontally && Math.abs(touchVelocity) > 0.3) { // Reduced threshold for more momentum
             const momentum = () => {
                 container.scrollLeft += touchVelocity;
-                touchVelocity *= 0.88; // Faster decay for more responsive feel
-                if (Math.abs(touchVelocity) > 0.2) {
+                touchVelocity *= 0.92; // Slower decay for longer momentum
+                if (Math.abs(touchVelocity) > 0.1) { // Reduced threshold for longer momentum
                     animationId = requestAnimationFrame(momentum);
                 }
             };
