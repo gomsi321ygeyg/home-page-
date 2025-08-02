@@ -604,19 +604,19 @@ a { color:inherit; text-decoration:none; }
         padding: 0;
     }
 
-    /* Hamburger on left */
+    /* Hamburger on left - moved further left */
     #hamburger {
         position: absolute;
-        left: 16px;
+        left: 8px;
         height: 36px;
         display: flex;
         align-items: center;
     }
 
-    /* Login button on right */
+    /* Login button on right - moved further right */
     #login-signup-btn {
         position: absolute;
-        right: 16px;
+        right: 8px;
         height: 36px;
         display: flex;
         align-items: center;
@@ -1495,8 +1495,25 @@ a { color:inherit; text-decoration:none; }
     }
 
     .footer-section {
-        width: 50%; /* Two per row */
+        width: 48%; /* Two per row with gap */
         text-align: left;
+    }
+    
+    /* Specific ordering: Main Pages, Categories, Legal, About */
+    .footer-section:nth-child(1) { /* Main Pages */
+        order: 1;
+    }
+    
+    .footer-section:nth-child(2) { /* Categories */
+        order: 2;
+    }
+    
+    .footer-section:nth-child(3) { /* Legal */
+        order: 3;
+    }
+    
+    .footer-section:nth-child(4) { /* About */
+        order: 4;
     }
     
     .footer-section h3 {
